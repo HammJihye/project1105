@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="#D4F4FA"
+    tools:context=".MainActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:textSize="40dp"
+        android:text="용돈기입장"
+        />
+    <Button
+        android:id="@+id/btnNewActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#5CD1E5"
+        android:text="작성하기"
+        />
+
+</LinearLayout>

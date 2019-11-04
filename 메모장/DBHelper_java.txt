@@ -1,0 +1,108 @@
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+    // DBHelper 생성자로 관리할 DB 이름과 버전 정보를 받음
+    public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+    }
+
+    // DB를 새로 생성할 때 호출되는 함수
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        // 새로운 테이블 생성
+        /* 이름은 MONEYBOOK이고, 자동으로 값이 증가하는 _id 정수형 기본키 컬럼과
+        item 문자열 컬럼, price 정수형 컬럼, create_at 문자열 컬럼으로 구성된 테이블을 생성. */
+        db.execSQL("CREATE TABLE MONEYBOOK (_id INTEGER PRIMARY KEY AUTOINCREMENT, item TEXT, price INTEGER ,create_at TEXT,total INTEGER, day INTEGER);");
+    }
+
+    // DB 업그레이드를 위해 버전이 변경될 때 호출되는 함수
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    public void insert(String create_at, String item, int price,int total,int day) {
+        // 읽고 쓰기가 가능하게 DB 열기
+        SQLiteDatabase db = getWritableDatabase();
+        String bb="INSERT INTO MONEYBOOK "+" (item,price,create_at,total,day) VALUES ('"+item+"','"+price+"','"+create_at+"','"+total+"','"+day+"');";
+        db.execSQL(bb);
+        db.close();
+    }
+    public void updateprice(int price,String item,String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        // 입력한 항목과 일치하는 행의 가격 정보 수정
+        db.execSQL("UPDATE MONEYBOOK SET price=" + price + " WHERE item='" + item + "'AND create_at='"+day+"';");
+        db.close();
+    }
+    public void updatemoney(int money,String item,String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        // 입력한 항목과 일치하는 행의 가격 정보 수정
+        db.execSQL("UPDATE MONEYBOOK SET total=" + money + " WHERE item='" + item + "'AND create_at='"+day+"';");
+        db.close();
+    }
+    public void updatemoneyprice(int money,int price,String item,String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        // 입력한 항목과 일치하는 행의 가격 정보 수정
+        db.execSQL("UPDATE MONEYBOOK SET total=" + money + ", price="+ price + " WHERE item='" + item + "'AND create_at='"+day+"';");
+        db.close();
+    }
+    public void delete(String item,String day) {
+        SQLiteDatabase db = getWritableDatabase();
+        // 입력한 항목과 일치하는 행 삭제
+        db.execSQL("DELETE FROM MONEYBOOK WHERE item='" + item + "'AND create_at='"+day+"';");
+        db.close();
+    }
+    //모든 db 데이터 출력
+    public String getResult(String month) {
+        // 읽기가 가능하게 DB 열기
+        SQLiteDatabase db = getReadableDatabase();
+        String result = "";
+        Cursor cursor = db.rawQuery("SELECT * FROM MONEYBOOK WHERE create_at LIKE'%" + month + "%' ORDER BY day ;" , null);
+        while (cursor.moveToNext()) {
+            result +=       cursor.getString(1)
+                    + " | 지출 금액: "
+                    + cursor.getInt(2)
+                    + "원 수입 금액: "
+                    + cursor.getInt(4)
+                    + "원 날짜: "
+                    + cursor.getString(3)
+                    + "\n";
+        }
+
+        return result;
+    }
+    //지출합
+    public int totalSum(String month){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(price) FROM MONEYBOOK WHERE create_at LIKE'%" + month + "%';", null);
+        cursor.moveToNext();
+        int sum = cursor.getInt(0);
+        return sum;
+    }
+    //한달 간 수입-지출
+    public int total(String month){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(total),SUM(price) FROM MONEYBOOK WHERE create_at LIKE'%" + month + "%';", null);
+        cursor.moveToNext();
+        int sum1 = cursor.getInt(0);//수입 합
+        int sum2=cursor.getInt(1);//지출 합
+        return sum1-sum2;
+    }
+    public boolean search(String item,String day){
+        SQLiteDatabase db = getReadableDatabase();
+        boolean fact;
+        Cursor cursor = db.rawQuery("SELECT MAX(item) FROM MONEYBOOK  WHERE item='" + item + "'AND create_at='"+day+"';", null);
+        cursor.moveToNext();
+        if(cursor.getString(0) == null || cursor.getString(0) .equals("") == true)
+        {
+            return false;
+        }
+        else{
+        return true;
+        }
+    }
+}

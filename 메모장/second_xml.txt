@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="날짜" />
+
+        <EditText
+            android:id="@+id/date"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:clickable="false"
+            android:focusable="false" />
+        <Button
+            android:background="#5CD1E5"
+            android:id="@+id/DayUpdate"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="날짜 변경" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="항목" />
+
+        <EditText
+            android:id="@+id/item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="수입" />
+
+        <EditText
+            android:id="@+id/Money"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="가격" />
+
+        <EditText
+            android:id="@+id/price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:background="#5CD1E5"
+            android:id="@+id/insert"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="추가" />
+
+        <Button
+            android:layout_marginLeft="5dp"
+            android:background="#5CD1E5"
+            android:id="@+id/delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="삭제" />
+
+        <Button
+            android:layout_marginLeft="5dp"
+            android:background="#5CD1E5"
+            android:id="@+id/update"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="수정" />
+
+        <Button
+            android:layout_marginLeft="5dp"
+            android:background="#5CD1E5"
+            android:id="@+id/select"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="조회" />
+
+    </LinearLayout>
+    <TextView
+        android:textSize="15dp"
+        android:id="@+id/totalSum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <ScrollView
+        android:background="#D4F4FA"
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:textSize="15dp"
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
+
+</LinearLayout>

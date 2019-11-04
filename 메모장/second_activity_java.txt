@@ -1,0 +1,165 @@
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.DatePickerDialog;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+public class SecondActivity extends AppCompatActivity {
+    int mYear, mMonth, mDay, mHour, mMinute;
+    EditText etDate,etItem,etPrice,etMoney;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.second);
+        setTitle("용돈기입장 작성하기");
+        final DBHelper dbHelper = new DBHelper(getApplicationContext(), "MoneyBook.db", null, 1);
+
+        // 테이블에 있는 모든 데이터 출력
+        final TextView result = (TextView) findViewById(R.id.result);
+        final TextView total=(TextView)findViewById(R.id.totalSum);
+
+        etDate = (EditText) findViewById(R.id.date);
+        etItem = (EditText) findViewById(R.id.item);
+        etPrice = (EditText) findViewById(R.id.price);
+        etMoney=(EditText)findViewById(R.id.Money);
+
+        final Button btnDayUpdate=(Button)findViewById(R.id.DayUpdate);
+        Calendar cal = new GregorianCalendar();
+        mYear = cal.get(Calendar.YEAR);
+        mMonth = cal.get(Calendar.MONTH);
+        mDay = cal.get(Calendar.DAY_OF_MONTH);
+        mHour = cal.get(Calendar.HOUR_OF_DAY);
+        mMinute = cal.get(Calendar.MINUTE);
+        etDate.setText(mYear+"년"+(mMonth+1)+"월"+mDay+"일");
+        btnDayUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(SecondActivity.this,mDateSetListener, mYear, mMonth, mDay).show();
+            }
+        });
+        // DB에 데이터 추가(수입과 지출 값이 들어가는 동시에 수입값에서 지출 값 빼기)
+        Button insert = (Button) findViewById(R.id.insert);
+        insert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String date = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1)+"/"+Integer.toString(mDay);
+                String item = etItem.getText().toString();
+                String money1=etMoney.getText().toString();
+                String price1=etPrice.getText().toString();
+                int money,price;
+                if(money1 == null || money1.equals("") == true){
+                    //NULL값이 들어갔을 때
+                    money=0;
+                }
+                else{
+                    money=Integer.parseInt(etMoney.getText().toString());
+                }
+                if(price1 == null || price1.equals("") == true){
+                    //NULL값이 들어갔을 때
+                    price=0;
+                }
+                else{
+                    price = Integer.parseInt(etPrice.getText().toString());
+                }
+                //같은 날짜 같은 항목이 있는지 확인
+                boolean fact=dbHelper.search(item,date);
+                if(fact==false){
+                    Toast.makeText(SecondActivity.this, "추가되었습니다.", Toast.LENGTH_SHORT).show();
+                    dbHelper.insert(date,item, price,money,mDay);
+                }
+                else{//없으면 추가
+                    Toast.makeText(SecondActivity.this, "이미 해당날짜에 같은 항목이 있습니다 새롭게 작성해주세요.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // DB에 있는 데이터 수정
+        Button update = (Button) findViewById(R.id.update);
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = etItem.getText().toString();
+                String day = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1)+"/"+Integer.toString(mDay);
+                String date = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1);
+                String money1=etMoney.getText().toString();//수익
+                String price1=etPrice.getText().toString();//지출
+                int money,price;//money 수익 price 지출
+
+                if((money1 == null || money1.equals("") == true)&&(price1 != null || price1.equals("") != true))//지출만 수정하려고 할때
+                {
+                    price = Integer.parseInt(etPrice.getText().toString());
+                    dbHelper.updateprice(price,item,day);
+                }
+                else if((money1 != null || money1.equals("") != true)&&(price1 == null || price1.equals("") == true))//수입만 수정하려고 할 때
+                {
+                    money = Integer.parseInt(etMoney.getText().toString());
+                    dbHelper.updatemoney(money,item,day);
+                }
+                else if((money1 != null || money1.equals("") != true)&&(price1 != null || price1.equals("") != true))
+                {
+                    price = Integer.parseInt(etPrice.getText().toString());
+                    money = Integer.parseInt(etMoney.getText().toString());
+                    dbHelper.updatemoneyprice(money,price,item,day);
+                }
+                total.setText("이번 달 지출 금액: "+dbHelper.totalSum(date)+"원\n이번 달 남은 금액: "+dbHelper.total(date));
+                result.setText(dbHelper.getResult(date));
+                Toast.makeText(SecondActivity.this, "수정 되었습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // DB에 있는 데이터 삭제
+        Button delete = (Button) findViewById(R.id.delete);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = etItem.getText().toString();
+                String day = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1)+"/"+Integer.toString(mDay);
+                String date = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1);
+                dbHelper.delete(item,day);
+                total.setText("이번 달 지출 금액: "+dbHelper.totalSum(date)+"원\n이번 달 남은 금액: "+dbHelper.total(date));
+                result.setText(dbHelper.getResult(date));
+                Toast.makeText(SecondActivity.this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // DB에 있는 데이터 조회(수입과 지출액)
+        Button select = (Button) findViewById(R.id.select);
+        select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String date = Integer.toString(mYear)+"/"+Integer.toString(mMonth+1);
+                if(dbHelper.total(date)<0){
+                    Toast.makeText(SecondActivity.this, "이번달에 지출이 너무 많습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else if(dbHelper.total(date)==0){
+                    Toast.makeText(SecondActivity.this, "경고! 이제 그만 쓰세요!", Toast.LENGTH_SHORT).show();
+                }
+                total.setText("이번 달 지출 금액: "+dbHelper.totalSum(date)+"원\n이번 달 남은 금액: "+dbHelper.total(date));
+                result.setText(dbHelper.getResult(date));
+            }
+        });
+    }
+
+    DatePickerDialog.OnDateSetListener mDateSetListener=new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            mYear=year;
+            mMonth=monthOfYear;
+            mDay=dayOfMonth;
+            etDate.setText(mYear+"년"+(mMonth+1)+"월"+mDay+"일");
+
+        }
+    };
+}
